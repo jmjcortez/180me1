@@ -101,6 +101,7 @@ class SearchAgent(Agent):
     
     state: a GameState object (pacman.py)
     """
+    #print state
     if self.searchFunction == None: raise Exception, "No search function provided for SearchAgent"
     starttime = time.time()
     problem = self.searchType(state) # Makes a new search problem
@@ -143,6 +144,7 @@ class PositionSearchProblem(search.SearchProblem):
     costFn: A function from a search state (tuple) to a non-negative number
     goal: A position in the gameState
     """
+
     self.walls = gameState.getWalls()
     self.startState = gameState.getPacmanPosition()
     if start != None: self.startState = start
@@ -155,7 +157,8 @@ class PositionSearchProblem(search.SearchProblem):
     self._visited, self._visitedlist, self._expanded = {}, [], 0
 
   def getStartState(self):
-    return self.startState
+  	#print self.startState
+  	return self.startState
 
   def isGoalState(self, state):
      isGoal = state == self.goal 
