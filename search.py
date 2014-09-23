@@ -189,44 +189,36 @@ def uniformCostSearch(problem):
 
   #     #curState, curMoves, curCost = fringe.pop();
   #     #print curState, curMoves, curCost
-  node = Node(state=problem.getStartState(),path_cost=0,action=[])    
-  #fringe = util.PriorityQueue()
-  # fringe.push(node,0)
-  fringe = []
-  fringe.insert(0,node)
-  expanded = set()
-  # #catchBasin = util.PriorityQueue()
-  while fringe:
-    fringe = sorted(fringe,key = lambda x: x.path_cost, reverse=True)
-    node = fringe.pop()
-    #print node 
-    #stateList.append(node.state)
-  #ut.sort(key=lambda x: x.count, reverse=True)
-  #   node = fringe.pop()
-    if problem.isGoalState(node.state):
-      print node.action
-      return node.action    #NOT SURE edit later
-    if( node.state in expanded):
-      continue
-    expanded.add(node.state)
-  #   for state, direction, cost in problem.getSuccessors(curState)
-    for state, direction, cost in problem.getSuccessors(node.state):
-      child = Node(parent=node,state=state,action=(node.action+[direction]),path_cost=cost) #NOTSURE baka cost + cost
-      #print child.action
-      isInsideFringe = False
-      existingInstance = None
-      for instance in fringe:
-        if child.state == instance.state:
-          existingInstance = instance
-          #print existingInstance.path_cost, child.path_cost
-          isInsideFringe = True
-      if child.state not in expanded or isInsideFringe==False:
-        fringe.append(child)
-      elif isInsideFringe:
-        #print existingInstance.path_cost, child.path_cost
-        if existingInstance.path_cost > child.path_cost:
-          existingInstance = child
-      #print child.path_cost
+  root = Node(state=problem.getStartState(),path_cost=0,action=[])    
+  expanded = []
+  fringe = util.PriorityQueue()
+  fringe.push(root,0)
+
+  def findNode(node):
+    #for stateX, actionX, nodeX, path_costX in expanded:
+    for curNodeX in expanded:
+      if curNodeX.state == node.state:
+        return (curNodeX.state,curNodeX.action,curNodeX.parent,curNodeX.path_cost); 
+    return None
+
+  while not fringe.isEmpty():
+    curNode = fringe.pop()
+    print 'felix'
+    if problem.isGoalState(curNode.state):
+      #print curNode.action
+      return curNode.action
+
+    expanded.append(curNode)
+
+    for state, direction, cost in problem.getSuccessors(curNode.state):
+      child = Node(state=state,parent=curNode,action=curNode.action+[direction],path_cost=curNode.path_cost+cost)
+
+      exploredNode = findNode(child)
+      if exploredNode == None:
+        fringe.push(child,child.path_cost)
+        expanded.append(child)
+      elif child.path_cost < exploredNode[3]:
+        fringe.push(child,child.path_cost)
 
   return []
 
@@ -252,45 +244,40 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
   "Search the node that has the lowest combined cost and heuristic first."
   "*** YOUR CODE HERE ***"
-  node = Node(state=problem.getStartState(),path_cost=0,action=[])    
-  #fringe = util.PriorityQueue()
-  # fringe.push(node,0)
-  fringe = []
-  fringe.insert(0,node)
-  expanded = set()
-  stateList = []
-  # #catchBasin = util.PriorityQueue()
-  while fringe:
-    fringe = sorted(fringe,key = lambda x: x.path_cost, reverse=True)
-    node = fringe.pop()
-    #print node 
-    #stateList.append(node.state)
-  #ut.sort(key=lambda x: x.count, reverse=True)
-  #   node = fringe.pop()
-    if problem.isGoalState(node.state):
-      #print node.action
-      return node.action    #NOT SURE edit later
-    if( node.state in expanded):
-      continue
-    expanded.add(node.state)
-  #   for state, direction, cost in problem.getSuccessors(curState)
-    for state, direction, cost in problem.getSuccessors(node.state):
-      prior = heuristic(state,problem)
-      child = Node(parent=node,state=state,action=(node.action+[direction]),path_cost=cost+prior) #NOTSURE baka cost + cost
-      #print child.action
-      isInsideFringe = False
-      existingInstance = None
-      for instance in fringe:
-        if child.state == instance.state:
-          existingInstance = instance
-          isInsideFringe = True
-      if child.state not in expanded or isInsideFringe==False:
-        fringe.append(child)
-      elif isInsideFringe:
-        print existingInstance.path_cost, child.path_cost
-        if existingInstance.path_cost > child.path_cost:
-          existingInstance = child
-      #print child.path_cost
+  root = Node(state=problem.getStartState(),path_cost=0,action=[])    
+  expanded = []
+  fringe = util.PriorityQueue()
+  fringe.push(root,0)
+
+  def findNode(node):
+    #for stateX, actionX, nodeX, path_costX in expanded:
+    for curNodeX in expanded:
+      if curNodeX.state == node.state:
+        return (curNodeX.state,curNodeX.action,curNodeX.parent,curNodeX.path_cost); 
+    return None
+
+  while not fringe.isEmpty():
+    curNode = fringe.pop()
+    #print 'felix'
+    if problem.isGoalState(curNode.state):
+      #print curNode.action
+      return curNode.action
+
+    expanded.append(curNode)
+
+    for state, direction, cost in problem.getSuccessors(curNode.state):
+      #fx = curNode.path_cost + cost + heuristic(state,problem)
+      fx = curNode.path_cost + cost + heuristic(state,problem)
+      #print heuristic(state,problem)
+      child = Node(state=state,parent=curNode,action=curNode.action+[direction],path_cost=curNode.path_cost+cost)
+      #print 'felix'
+      exploredNode = findNode(child)
+      if exploredNode == None:
+        fringe.push(child,fx)
+        expanded.append(child)
+      elif child.path_cost < exploredNode[3]:
+
+        fringe.push(child,fx)
 
   return []
     
